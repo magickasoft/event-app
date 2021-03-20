@@ -1,10 +1,11 @@
 import React from 'react';
 import Grid from '@kiwicom/orbit-components/lib/utils/Grid';
 import EventItem from 'components/EventItem';
-
+import {events} from './events_mock';
 import './Eventlist.css';
 
 function EventsList() {
+  const renderEvent = (props: any) => <EventItem {...props} />;
   return (
     <Grid
       // @ts-ignore
@@ -27,47 +28,7 @@ function EventsList() {
         columns: 'repeat(1, minmax(10px, 1fr))',
         gap: '15px',
       }}>
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
-      <EventItem />
+      {events.map(renderEvent)}
     </Grid>
   );
 }
