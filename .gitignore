@@ -2,11 +2,15 @@
 
 # dependencies
 /node_modules
+/vendor
 /.pnp
 .pnp.js
 
 # testing
 /coverage
+
+## storybook artifacts
+storybook-static/
 
 # production
 /build
@@ -21,3 +25,5 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.idea/
+docker-compose.override.yml
