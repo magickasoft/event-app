@@ -1,0 +1,13 @@
+{
+  "prettier.configPath": ".prettierrc",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["javascript"],
+  "eslint.enable": true,
+  "eslint.format.enable": true,
+  "eslint.debug": true,
+  "autoprefixer.formatOnSave": true
+}
