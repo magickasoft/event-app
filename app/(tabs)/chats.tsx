@@ -2,7 +2,7 @@ import {StyleSheet} from 'react-native';
 
 import {Text, View} from '@/components/Themed';
 
-export default function ChatsScreen() {
+export default function Chats() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>ChatsScreen</Text>
@@ -19,5 +19,5 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-  }
+  },
 });

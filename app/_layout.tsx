@@ -10,6 +10,8 @@ import {useColorScheme} from '@/components/useColorScheme';
 
 import {config} from '../gluestack-ui.config';
 
+import {SessionProvider} from '@/contexts/auth';
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -44,7 +46,11 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <SessionProvider>
+      <RootLayoutNav />
+    </SessionProvider>
+  );
 }
 
 function RootLayoutNav() {

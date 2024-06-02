@@ -33,9 +33,13 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import {Keyboard} from 'react-native';
 import {AlertTriangle, EyeIcon, EyeOffIcon} from 'lucide-react-native';
+import {router} from 'expo-router';
 
 import GuestLayout from '../../layouts/GuestLayout';
 import StyledExpoRouterLink from '../../components/StyledExpoRouterLink';
+
+import {useSession} from '../../hooks/useSession';
+import {isDev} from '../../constants/ui';
 
 const signInSchema = z.object({
   email: z.string().min(1, 'Email is required').email(),
@@ -46,10 +50,13 @@ const signInSchema = z.object({
     .regex(new RegExp('.*[a-z].*'), 'One lowercase character')
     .regex(new RegExp('.*\\d.*'), 'One number')
     .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), 'One special character'),
-  rememberme: z.boolean().optional(),
 });
 
 type SignInSchemaType = z.infer<typeof signInSchema>;
+
+const defaultValues = isDev
+  ? {email: 'john.doe@gmail.com', password: 'Password!~123'}
+  : ({email: '', password: ''} satisfies SignInSchemaType);
 
 const SignInForm = () => {
   const {
@@ -58,10 +65,12 @@ const SignInForm = () => {
     handleSubmit,
     reset,
   } = useForm<SignInSchemaType>({
+    defaultValues,
     resolver: zodResolver(signInSchema),
   });
   const [isEmailFocused, setIsEmailFocused] = useState(false);
 
+  const {signIn} = useSession();
   const toast = useToast();
 
   const onSubmit = (_data: SignInSchemaType) => {
@@ -76,7 +85,8 @@ const SignInForm = () => {
       },
     });
     reset();
-    // Implement your own onSubmit and navigation logic here.
+    signIn();
+    router.replace('/(tabs)/map');
   };
 
   const handleKeyPress = () => {
@@ -177,19 +187,6 @@ const SignInForm = () => {
       <StyledExpoRouterLink ml="auto" href="/forgot-password">
         <LinkText fontSize="$xs">Forgot password?</LinkText>
       </StyledExpoRouterLink>
-      <Controller
-        name="rememberme"
-        defaultValue={false}
-        control={control}
-        render={({field: {onChange, value}}) => (
-          <Checkbox my="$5" size="sm" value="Remember me" isChecked={value} onChange={onChange} alignSelf="flex-start">
-            <CheckboxIndicator mr="$2">
-              <CheckboxIcon as={CheckIcon} />
-            </CheckboxIndicator>
-            <CheckboxLabel>Remember me and keep me logged in</CheckboxLabel>
-          </Checkbox>
-        )}
-      />
       <Button variant="solid" size="lg" mt="$5" onPress={handleSubmit(onSubmit)}>
         <ButtonText fontSize="$sm"> SIGN IN</ButtonText>
       </Button>

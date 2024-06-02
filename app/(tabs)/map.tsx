@@ -6,7 +6,7 @@ import {MapWeb} from '@/components/MapWeb';
 
 import {isWeb} from '@/constants/ui';
 
-export default function MapScreen() {
+export default function Map() {
   return isWeb ? <MapWeb /> : <Text style={styles.title}>mobile MapScreen</Text>;
 }
 
