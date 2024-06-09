@@ -56,11 +56,11 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import {Keyboard} from 'react-native';
 import {AlertTriangle} from 'lucide-react-native';
-import {router} from 'expo-router';
 
-import GuestLayout from '../layouts/GuestLayout';
+import GuestLayout from '../../layouts/GuestLayout';
 
-import {isDev} from '../constants/ui';
+import {isDev} from '../../constants/ui';
+import {DropZone} from './DropZone';
 
 const createEventSchema = z.object({
   name: z.string().min(1, 'Event name is required'),
@@ -115,28 +115,12 @@ const CreateEventForm = () => {
             <AvatarFallbackText>John Doe</AvatarFallbackText>
           </Avatar>
         </FormControl>
-
         <FormControl my="$2">
           <FormControlLabel>
             <FormControlLabelText>Add Location Details</FormControlLabelText>
           </FormControlLabel>
           <VStack w="$full" flex={1} justifyContent="flex-start" flexDirection="row" flexWrap="wrap">
-            <Image
-              mr="$2"
-              size="lg"
-              borderRadius="$3xl"
-              source={{
-                uri: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-              }}
-            />
-            <Image
-              mr="$2"
-              size="lg"
-              borderRadius="$3xl"
-              source={{
-                uri: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-              }}
-            />
+            <DropZone />
           </VStack>
         </FormControl>
 

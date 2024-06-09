@@ -1,8 +1,12 @@
 import {buildServerURL} from './build-server-url';
-// import {isWeb} from '../constants/ui';
+import {isWeb} from '../constants/ui';
 
-export function getServerURL(): string {
-  // const url = isWeb ? '/api' : (process.env.EXPO_SERVER_URL as string);
-  const url = process.env.EXPO_SERVER_URL as string;
+export function getAuthApiURL(): string {
+  const url = isWeb ? 'http://localhost:3000/auth/' : (process.env.EXPO_AUTH_API_URL as string);
+  return buildServerURL(url);
+}
+
+export function getS3ApiURL(): string {
+  const url = isWeb ? 'http://localhost:3000/s3/' : (process.env.EXPO_S3_API_URL as string);
   return buildServerURL(url);
 }

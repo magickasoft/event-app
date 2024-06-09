@@ -9,19 +9,17 @@ import Colors from '@/constants/Colors';
 import {useColorScheme} from '@/components/useColorScheme';
 import {useClientOnlyValue} from '@/components/useClientOnlyValue';
 
-import {Text} from '@/components/Themed';
-
 import {useSession} from '@/hooks/useSession';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const {session, isLoading} = useSession();
+  const {accessToken, isLoading} = useSession();
 
   if (isLoading) {
     return null;
   }
 
-  if (!session) {
+  if (!accessToken) {
     return <Redirect href="/login" />;
   }
 

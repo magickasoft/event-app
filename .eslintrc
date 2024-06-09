@@ -6,6 +6,7 @@
     "plugin:jsx-a11y/recommended",
     "plugin:react-hooks/recommended",
     "eslint-config-prettier",
+    "plugin:@tanstack/eslint-plugin-query/recommended",
   ],
   "settings": {
     "react": {
@@ -27,7 +28,7 @@
     "ecmaVersion": 2020, // Allows for the parsing of modern ECMAScript features
     "sourceType": "module", // Allows for the use of imports
   },
-  "plugins": ["simple-import-sort"],
+  "plugins": ["simple-import-sort", "@tanstack/query"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "simple-import-sort/imports": "error",

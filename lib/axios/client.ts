@@ -1,12 +1,13 @@
 'use client';
 
-import type {AxiosInstance} from 'axios';
+import type {AxiosError, AxiosInstance, AxiosRequestConfig} from 'axios';
 import axios from 'axios';
 
-import {getServerURL} from '../get-server-url';
+import {getAuthApiURL, getS3ApiURL} from '../get-server-url';
+import {getAccessToken} from '../get-access-token';
 
-const API: AxiosInstance = axios.create({
-  baseURL: getServerURL(),
+const AUTH_API: AxiosInstance = axios.create({
+  baseURL: getAuthApiURL(),
   responseType: 'json',
   withCredentials: true,
   headers: {
@@ -15,4 +16,31 @@ const API: AxiosInstance = axios.create({
   },
 });
 
-export {API};
+const S3_API: AxiosInstance = axios.create({
+  baseURL: getS3ApiURL(),
+  responseType: 'json',
+  withCredentials: true,
+  headers: {},
+});
+
+const requestInterceptor = async (config: AxiosRequestConfig): Promise<any> => {
+  const accessToken = getAccessToken();
+
+  if (accessToken) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
+  }
+
+  return config;
+};
+
+const requestErrorInterceptor = (error: AxiosError): Promise<never> => {
+  return Promise.reject(error);
+};
+
+AUTH_API.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
+S3_API.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
+
+export {AUTH_API, S3_API};

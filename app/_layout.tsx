@@ -11,6 +11,7 @@ import {useColorScheme} from '@/components/useColorScheme';
 import {config} from '../gluestack-ui.config';
 
 import {SessionProvider} from '@/contexts/auth';
+import {QueryClientProvider} from '@/contexts/QueryClientProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -47,9 +48,11 @@ export default function RootLayout() {
   }
 
   return (
-    <SessionProvider>
-      <RootLayoutNav />
-    </SessionProvider>
+    <QueryClientProvider>
+      <SessionProvider>
+        <RootLayoutNav />
+      </SessionProvider>
+    </QueryClientProvider>
   );
 }
 

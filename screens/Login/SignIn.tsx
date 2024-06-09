@@ -42,21 +42,22 @@ import {useSession} from '../../hooks/useSession';
 import {isDev} from '../../constants/ui';
 
 const signInSchema = z.object({
-  email: z.string().min(1, 'Email is required').email(),
-  password: z
-    .string()
-    .min(6, 'Must be at least 8 characters in length')
-    .regex(new RegExp('.*[A-Z].*'), 'One uppercase character')
-    .regex(new RegExp('.*[a-z].*'), 'One lowercase character')
-    .regex(new RegExp('.*\\d.*'), 'One number')
-    .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), 'One special character'),
+  login: z.string().min(1, 'Login is required'),
+  password: z.string().min(6, 'Must be at least 8 characters in length'),
+  // .regex(new RegExp('.*[A-Z].*'), 'One uppercase character')
+  // .regex(new RegExp('.*[a-z].*'), 'One lowercase character')
+  // .regex(new RegExp('.*\\d.*'), 'One number')
+  // .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), 'One special character'),
 });
 
-type SignInSchemaType = z.infer<typeof signInSchema>;
+export type SignInSchemaType = {
+  login: string;
+  password: string;
+};
 
 const defaultValues = isDev
-  ? {email: 'john.doe@gmail.com', password: 'Password!~123'}
-  : ({email: '', password: ''} satisfies SignInSchemaType);
+  ? {login: '+79537647035', password: 'magickasoft'}
+  : ({login: '', password: ''} satisfies SignInSchemaType);
 
 const SignInForm = () => {
   const {
@@ -71,22 +72,13 @@ const SignInForm = () => {
   const [isEmailFocused, setIsEmailFocused] = useState(false);
 
   const {signIn} = useSession();
-  const toast = useToast();
 
-  const onSubmit = (_data: SignInSchemaType) => {
-    toast.show({
-      placement: 'bottom right',
-      render: ({id}) => {
-        return (
-          <Toast nativeID={id} variant="accent" action="success">
-            <ToastTitle>Signed in successfully</ToastTitle>
-          </Toast>
-        );
-      },
-    });
-    reset();
-    signIn();
-    router.replace('/(tabs)/map');
+  const onSubmit = async (_data: SignInSchemaType) => {
+    try {
+      signIn(_data);
+      reset();
+      router.replace('(tabs)/map');
+    } catch (e) {}
   };
 
   const handleKeyPress = () => {
@@ -105,15 +97,15 @@ const SignInForm = () => {
   return (
     <>
       <VStack justifyContent="space-between">
-        <FormControl isInvalid={(!!errors.email || isEmailFocused) && !!errors.email} isRequired={true}>
+        <FormControl isInvalid={(!!errors.login || isEmailFocused) && !!errors.login} isRequired={true}>
           <Controller
-            name="email"
+            name="login"
             defaultValue=""
             control={control}
             rules={{
               validate: async (value) => {
                 try {
-                  await signInSchema.parseAsync({email: value});
+                  await signInSchema.parseAsync({login: value});
                   return true;
                 } catch (error: any) {
                   return error.message;
@@ -124,7 +116,7 @@ const SignInForm = () => {
               <Input>
                 <InputField
                   fontSize="$sm"
-                  placeholder="Email"
+                  placeholder="Login"
                   type="text"
                   value={value}
                   onChangeText={onChange}
@@ -137,7 +129,7 @@ const SignInForm = () => {
           />
           <FormControlError>
             <FormControlErrorIcon size="md" as={AlertTriangle} />
-            <FormControlErrorText>{errors?.email?.message}</FormControlErrorText>
+            <FormControlErrorText>{errors?.login?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
 
