@@ -1,12 +1,23 @@
 import React, {useMemo} from 'react';
 import {useStorageState} from '@/hooks/useStorageState';
-import type {AuthContextValue, Oauth2TokenResponseData, Oauth2TokenRequestData, Error} from './types';
+import type {
+  AuthContextValue,
+  Oauth2TokenResponseData,
+  Oauth2TokenRequestData,
+  SignUpResponseData,
+  SignUpRequestData,
+  Error,
+} from './types';
+import {router} from 'expo-router';
+
+import {Toast, ToastTitle, useToast} from '@gluestack-ui/themed';
 
 import {AUTH_API} from '@/lib/axios/client';
 import {AxiosError} from 'axios';
 import {jwtDecode} from 'jwt-decode';
 
 export const AuthContext = React.createContext<AuthContextValue>({
+  signUp: () => null,
   signIn: () => null,
   signOut: () => null,
   decodeToken: null,
@@ -18,8 +29,32 @@ export const AuthContext = React.createContext<AuthContextValue>({
 export function SessionProvider(props: Readonly<React.PropsWithChildren>) {
   const [[isATLoading, accessToken], setAccessToken] = useStorageState('access_token');
   const [[isRTLoading, refreshToken], setRefreshToken] = useStorageState('refresh_token');
+  const [[isAILoading, actionId], setActionId] = useStorageState('action_id');
 
   const decodeToken = accessToken ? jwtDecode(accessToken) : null;
+  const toast = useToast();
+
+  const signUp = async (data: SignUpRequestData) => {
+    try {
+      const response = await AUTH_API.post<Readonly<SignUpRequestData>, Readonly<SignUpResponseData>>(
+        '/authentication/sign-up',
+        data,
+      );
+      setActionId(response.data.action_id);
+      router.replace('/verify-otp');
+    } catch (e: any) {
+      toast.show({
+        placement: 'bottom right',
+        render: ({id}) => {
+          return (
+            <Toast nativeID={id} action="error">
+              <ToastTitle>{e.response?.data?.detail?.msg || 'Error'}</ToastTitle>
+            </Toast>
+          );
+        },
+      });
+    }
+  };
 
   const signIn = async (data: Oauth2TokenRequestData) => {
     try {
@@ -60,14 +95,16 @@ export function SessionProvider(props: Readonly<React.PropsWithChildren>) {
 
   const contextValue = useMemo(
     () => ({
+      signUp,
       signIn,
       signOut,
       decodeToken,
+      actionId,
       accessToken,
       refreshToken,
-      isLoading: isATLoading || isRTLoading,
+      isLoading: isATLoading || isRTLoading || isAILoading,
     }),
-    [isATLoading, isRTLoading, accessToken, refreshToken, decodeToken, signIn, signOut],
+    [isAILoading, isATLoading, isRTLoading, actionId, accessToken, refreshToken, decodeToken, signUp, signIn, signOut],
   );
 
   return <AuthContext.Provider value={contextValue}>{props.children}</AuthContext.Provider>;

@@ -15,10 +15,6 @@ import {
   FormControlErrorIcon,
   FormControlErrorText,
   InputIcon,
-  FormControlHelper,
-  Toast,
-  ToastTitle,
-  useToast,
   CheckboxIndicator,
   CheckboxIcon,
   CheckboxLabel,
@@ -35,32 +31,52 @@ import {AlertTriangle, EyeIcon, EyeOffIcon} from 'lucide-react-native';
 import {z} from 'zod';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Keyboard} from 'react-native';
+import {useSession} from '../../hooks/useSession';
 
 import GuestLayout from '../../layouts/GuestLayout';
 
 import StyledExpoRouterLink from '../../components/StyledExpoRouterLink';
-import {router} from 'expo-router';
+import {isDev} from '../../constants/ui';
 
 const signUpSchema = z.object({
-  email: z.string().min(1, 'Email is required').email(),
-  password: z
-    .string()
-    .min(6, 'Must be at least 8 characters in length')
-    .regex(new RegExp('.*[A-Z].*'), 'One uppercase character')
-    .regex(new RegExp('.*[a-z].*'), 'One lowercase character')
-    .regex(new RegExp('.*\\d.*'), 'One number')
-    .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), 'One special character'),
-  confirmpassword: z
-    .string()
-    .min(6, 'Must be at least 8 characters in length')
-    .regex(new RegExp('.*[A-Z].*'), 'One uppercase character')
-    .regex(new RegExp('.*[a-z].*'), 'One lowercase character')
-    .regex(new RegExp('.*\\d.*'), 'One number')
-    .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), 'One special character'),
+  first_name: z.string().min(1, 'First name is required'),
+  second_name: z.string().min(1, 'Second name is required'),
+  patronymic: z.string().min(1, 'Patronymic is required'),
+  phone: z.string().min(1, 'Phone is required'),
+  password: z.string().min(6, 'Must be at least 8 characters in length'),
+  // .regex(new RegExp('.*[A-Z].*'), 'One uppercase character')
+  // .regex(new RegExp('.*[a-z].*'), 'One lowercase character')
+  // .regex(new RegExp('.*\\d.*'), 'One number')
+  // .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), 'One special character'),
   rememberme: z.boolean().optional(),
 });
 
-type SignUpSchemaType = z.infer<typeof signUpSchema>;
+type SignUpSchemaType = {
+  first_name: string;
+  second_name: string;
+  patronymic: string;
+  phone: string;
+  password: string;
+  rememberme?: boolean | undefined;
+};
+
+const defaultValues = isDev
+  ? {
+      first_name: 'Evgeny',
+      second_name: 'Shmakov',
+      patronymic: 'Sergeevich',
+      phone: '+79537647035',
+      password: 'magickasoft',
+      rememberme: true,
+    }
+  : ({
+      first_name: '',
+      second_name: '',
+      patronymic: '',
+      phone: '',
+      password: '',
+      rememberme: false,
+    } satisfies SignUpSchemaType);
 
 const SignUpForm = () => {
   const {
@@ -69,41 +85,17 @@ const SignUpForm = () => {
     handleSubmit,
     reset,
   } = useForm<SignUpSchemaType>({
+    defaultValues,
     resolver: zodResolver(signUpSchema),
   });
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
-  const [pwMatched, setPwMatched] = useState(false);
-  const toast = useToast();
+
+  const {signUp} = useSession();
 
   const onSubmit = (_data: SignUpSchemaType) => {
-    if (_data.password === _data.confirmpassword) {
-      setPwMatched(true);
-      toast.show({
-        placement: 'bottom right',
-        render: ({id}) => {
-          return (
-            <Toast nativeID={id} variant="accent" action="success">
-              <ToastTitle>Signed up successfully</ToastTitle>
-            </Toast>
-          );
-        },
-      });
+    try {
+      signUp(_data);
       reset();
-    } else {
-      toast.show({
-        placement: 'bottom right',
-        render: ({id}) => {
-          return (
-            <Toast nativeID={id} action="error">
-              <ToastTitle>Passwords do not match</ToastTitle>
-            </Toast>
-          );
-        },
-      });
-    }
-    // Implement your own onSubmit and navigation logic here.
-    // Navigate to appropriate location
-    router.replace('/login');
+    } catch (e) {}
   };
 
   const handleKeyPress = () => {
@@ -111,14 +103,8 @@ const SignUpForm = () => {
     handleSubmit(onSubmit)();
   };
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const handleState = () => {
     setShowPassword((showState) => {
-      return !showState;
-    });
-  };
-  const handleConfirmPwState = () => {
-    setShowConfirmPassword((showState) => {
       return !showState;
     });
   };
@@ -126,15 +112,15 @@ const SignUpForm = () => {
   return (
     <>
       <VStack justifyContent="space-between">
-        <FormControl isInvalid={(!!errors.email || isEmailFocused) && !!errors.email} isRequired={true}>
+        <FormControl my="$3" isInvalid={!!errors.first_name} isRequired={true}>
           <Controller
-            name="email"
+            name="first_name"
             defaultValue=""
             control={control}
             rules={{
               validate: async (value) => {
                 try {
-                  await signUpSchema.parseAsync({email: value});
+                  await signUpSchema.parseAsync({first_name: value});
                   return true;
                 } catch (error: any) {
                   return error.message;
@@ -144,7 +130,7 @@ const SignUpForm = () => {
             render={({field: {onChange, onBlur, value}}) => (
               <Input>
                 <InputField
-                  placeholder="Email"
+                  placeholder="First name"
                   fontSize="$sm"
                   type="text"
                   value={value}
@@ -158,11 +144,119 @@ const SignUpForm = () => {
           />
           <FormControlError>
             <FormControlErrorIcon size="md" as={AlertTriangle} />
-            <FormControlErrorText>{errors?.email?.message}</FormControlErrorText>
+            <FormControlErrorText>{errors?.first_name?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
 
-        <FormControl isInvalid={!!errors.password} isRequired={true} my="$6">
+        <FormControl my="$3" isInvalid={!!errors.second_name} isRequired={true}>
+          <Controller
+            name="second_name"
+            defaultValue=""
+            control={control}
+            rules={{
+              validate: async (value) => {
+                try {
+                  await signUpSchema.parseAsync({second_name: value});
+                  return true;
+                } catch (error: any) {
+                  return error.message;
+                }
+              },
+            }}
+            render={({field: {onChange, onBlur, value}}) => (
+              <Input>
+                <InputField
+                  placeholder="Second name"
+                  fontSize="$sm"
+                  type="text"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onSubmitEditing={handleKeyPress}
+                  returnKeyType="done"
+                />
+              </Input>
+            )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="md" as={AlertTriangle} />
+            <FormControlErrorText>{errors?.second_name?.message}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl my="$3" isInvalid={!!errors.patronymic} isRequired={true}>
+          <Controller
+            name="patronymic"
+            defaultValue=""
+            control={control}
+            rules={{
+              validate: async (value) => {
+                try {
+                  await signUpSchema.parseAsync({patronymic: value});
+                  return true;
+                } catch (error: any) {
+                  return error.message;
+                }
+              },
+            }}
+            render={({field: {onChange, onBlur, value}}) => (
+              <Input>
+                <InputField
+                  placeholder="Patronymic"
+                  fontSize="$sm"
+                  type="text"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onSubmitEditing={handleKeyPress}
+                  returnKeyType="done"
+                />
+              </Input>
+            )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="md" as={AlertTriangle} />
+            <FormControlErrorText>{errors?.patronymic?.message}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl my="$3" isInvalid={!!errors.phone} isRequired={true}>
+          <Controller
+            name="phone"
+            defaultValue=""
+            control={control}
+            rules={{
+              validate: async (value) => {
+                try {
+                  await signUpSchema.parseAsync({phone: value});
+                  return true;
+                } catch (error: any) {
+                  return error.message;
+                }
+              },
+            }}
+            render={({field: {onChange, onBlur, value}}) => (
+              <Input>
+                <InputField
+                  placeholder="Phone"
+                  fontSize="$sm"
+                  type="text"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onSubmitEditing={handleKeyPress}
+                  returnKeyType="done"
+                />
+              </Input>
+            )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="md" as={AlertTriangle} />
+            <FormControlErrorText>{errors?.phone?.message}</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl my="$3" isInvalid={!!errors.password} isRequired={true}>
           <Controller
             defaultValue=""
             name="password"
@@ -200,48 +294,6 @@ const SignUpForm = () => {
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle} />
             <FormControlErrorText>{errors?.password?.message}</FormControlErrorText>
-          </FormControlError>
-        </FormControl>
-
-        <FormControl isInvalid={!!errors.confirmpassword} isRequired={true}>
-          <Controller
-            defaultValue=""
-            name="confirmpassword"
-            control={control}
-            rules={{
-              validate: async (value) => {
-                try {
-                  await signUpSchema.parseAsync({
-                    password: value,
-                  });
-
-                  return true;
-                } catch (error: any) {
-                  return error.message;
-                }
-              },
-            }}
-            render={({field: {onChange, onBlur, value}}) => (
-              <Input>
-                <InputField
-                  placeholder="Confirm Password"
-                  fontSize="$sm"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  onSubmitEditing={handleKeyPress}
-                  returnKeyType="done"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                />
-                <InputSlot onPress={handleConfirmPwState} pr="$3">
-                  <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
-                </InputSlot>
-              </Input>
-            )}
-          />
-          <FormControlError>
-            <FormControlErrorIcon size="sm" as={AlertTriangle} />
-            <FormControlErrorText>{errors?.confirmpassword?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
       </VStack>

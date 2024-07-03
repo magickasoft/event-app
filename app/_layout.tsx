@@ -49,9 +49,11 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider>
-      <SessionProvider>
-        <RootLayoutNav />
-      </SessionProvider>
+      <GluestackUIProvider config={config}>
+        <SessionProvider>
+          <RootLayoutNav />
+        </SessionProvider>
+      </GluestackUIProvider>
     </QueryClientProvider>
   );
 }
@@ -61,18 +63,16 @@ function RootLayoutNav() {
 
   return (
     // <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-    <GluestackUIProvider config={config}>
-      <Stack>
-        <Stack.Screen name="index" options={{headerShown: false}} />
-        <Stack.Screen name="login" options={{headerShown: false}} />
-        <Stack.Screen name="signup" options={{headerShown: false}} />
-        <Stack.Screen name="forgot-password" options={{headerShown: false}} />
-        <Stack.Screen name="verify-otp" options={{headerShown: false}} />
-        <Stack.Screen name="create-password" options={{headerShown: false}} />
-        <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-        <Stack.Screen name="modal" options={{presentation: 'modal'}} />
-      </Stack>
-    </GluestackUIProvider>
+    <Stack>
+      <Stack.Screen name="index" options={{headerShown: false}} />
+      <Stack.Screen name="login" options={{headerShown: false}} />
+      <Stack.Screen name="signup" options={{headerShown: false}} />
+      <Stack.Screen name="forgot-password" options={{headerShown: false}} />
+      <Stack.Screen name="verify-otp" options={{headerShown: false}} />
+      <Stack.Screen name="create-password" options={{headerShown: false}} />
+      <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+      <Stack.Screen name="modal" options={{presentation: 'modal'}} />
+    </Stack>
     // </ThemeProvider>
   );
 }

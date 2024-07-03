@@ -9,11 +9,26 @@ export interface Oauth2TokenRequestData {
   login: string;
   password: string;
 }
+
+export interface SignUpResponseData {
+  data: {
+    action_id: string;
+  };
+}
+export interface SignUpRequestData {
+  first_name: string;
+  second_name: string;
+  patronymic: string;
+  phone: string;
+  password: string;
+}
+
 export interface Error {
   detail: string;
   code: number;
 }
 export interface AuthContextValue {
+  signUp: (data: SignUpRequestData) => void;
   signIn: (data: Oauth2TokenRequestData) => void;
   signOut: () => void;
   decodeToken?: JwtPayload | null;
