@@ -33,7 +33,6 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import {Keyboard} from 'react-native';
 import {AlertTriangle, EyeIcon, EyeOffIcon} from 'lucide-react-native';
-import {router} from 'expo-router';
 
 import GuestLayout from '../../layouts/GuestLayout';
 import StyledExpoRouterLink from '../../components/StyledExpoRouterLink';
@@ -69,7 +68,6 @@ const SignInForm = () => {
     defaultValues,
     resolver: zodResolver(signInSchema),
   });
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
 
   const {signIn} = useSession();
 
@@ -77,7 +75,6 @@ const SignInForm = () => {
     try {
       signIn(_data);
       reset();
-      router.replace('(tabs)/map');
     } catch (e) {}
   };
 
@@ -97,7 +94,7 @@ const SignInForm = () => {
   return (
     <>
       <VStack justifyContent="space-between">
-        <FormControl isInvalid={(!!errors.login || isEmailFocused) && !!errors.login} isRequired={true}>
+        <FormControl isInvalid={!!errors.login} isRequired={true}>
           <Controller
             name="login"
             defaultValue=""
@@ -173,14 +170,13 @@ const SignInForm = () => {
             <FormControlErrorText>{errors?.password?.message}</FormControlErrorText>
           </FormControlError>
 
-          <FormControlHelper></FormControlHelper>
         </FormControl>
       </VStack>
       <StyledExpoRouterLink ml="auto" href="/forgot-password">
         <LinkText fontSize="$xs">Forgot password?</LinkText>
       </StyledExpoRouterLink>
       <Button variant="solid" size="lg" mt="$5" onPress={handleSubmit(onSubmit)}>
-        <ButtonText fontSize="$sm"> SIGN IN</ButtonText>
+        <ButtonText fontSize="$sm">SIGN IN</ButtonText>
       </Button>
     </>
   );
@@ -191,7 +187,7 @@ const SignIn = () => {
     <GuestLayout>
       <Box>
         <VStack px="$3" mt="$4.5" space="md" mb="$4">
-          <StyledExpoRouterLink href="..">
+          <StyledExpoRouterLink href="/">
             <Icon as={ArrowLeftIcon} color="$textLight50" sx={{_dark: {color: '$textDark50'}}} />
             <Text ml="$2" color="$textLight50" sx={{_dark: {color: '$textDark50'}}} fontSize="$lg">
               Back
@@ -218,6 +214,7 @@ const SignIn = () => {
           <Text color="$textLight500" fontSize="$sm" sx={{_dark: {color: '$textDark400'}}}>
             Don't have an account?
           </Text>
+
           <StyledExpoRouterLink href="/signup">
             <LinkText fontSize="$sm">Sign up</LinkText>
           </StyledExpoRouterLink>

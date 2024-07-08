@@ -103,6 +103,7 @@ const SignUpForm = () => {
     handleSubmit(onSubmit)();
   };
   const [showPassword, setShowPassword] = useState(false);
+
   const handleState = () => {
     setShowPassword((showState) => {
       return !showState;
@@ -356,7 +357,7 @@ const SignUp = () => {
     <GuestLayout>
       <Box>
         <VStack px="$3" mt="$4.5" space="md" mb="$4">
-          <StyledExpoRouterLink href="..">
+          <StyledExpoRouterLink href="/">
             <Icon as={ArrowLeftIcon} color="$textLight50" sx={{_dark: {color: '$textDark50'}}} />
             <Text ml="$2" color="$textLight50" sx={{_dark: {color: '$textDark50'}}} fontSize="$lg">
               Back
@@ -380,14 +381,7 @@ const SignUp = () => {
         <SignUpForm />
 
         <HStack space="xs" alignItems="center" justifyContent="center" mt="auto">
-          <Text
-            color="$textLight500"
-            sx={{
-              _dark: {
-                color: '$textDark400',
-              },
-            }}
-            fontSize="$sm">
+          <Text color="$textLight500" fontSize="$sm" sx={{_dark: {color: '$textDark400'}}}>
             Already have an account?
           </Text>
 

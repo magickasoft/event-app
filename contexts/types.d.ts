@@ -23,11 +23,20 @@ export interface SignUpRequestData {
   password: string;
 }
 
+export interface CodeVerificationRequestData {
+  verification_code: string;
+}
+
+export interface CodeVerificationResponseData {
+  data: any;
+}
+
 export interface Error {
   detail: string;
   code: number;
 }
 export interface AuthContextValue {
+  codeVerification: (data: CodeVerificationRequestData) => void;
   signUp: (data: SignUpRequestData) => void;
   signIn: (data: Oauth2TokenRequestData) => void;
   signOut: () => void;
