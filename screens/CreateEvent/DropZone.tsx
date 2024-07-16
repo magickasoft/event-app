@@ -1,32 +1,38 @@
 import React from 'react';
-import {Card, Icon, DownloadIcon, Image} from '@gluestack-ui/themed';
+import {Card, Icon, DownloadIcon} from '@gluestack-ui/themed';
 
 import {S3_API} from '@/lib/axios/client';
 import {useDropzone} from 'react-dropzone';
 
-const rout = '/images';
-export const DropZone = () => {
-  const [id, setId] = React.useState(null);
-  const [pic, setPic] = React.useState('');
+import {S3Image} from './S3Image';
+
+type DropZoneProps = {
+  imagesLimit?: number;
+};
+
+export const DropZone = ({imagesLimit = 6}: DropZoneProps) => {
+  const [imageIds, setImageIds] = React.useState<string[]>([]);
   const onDrop = React.useCallback((acceptedFiles: any) => {
     acceptedFiles.forEach((file: Blob) => {
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
-      reader.onload = async () => {
+      const loadToS3 = async () => {
         const binaryData = reader.result;
         try {
-          const {data} = await S3_API.post(rout, binaryData, {
+          const {data} = await S3_API.post('/images', binaryData, {
             headers: {
               'Content-Type': file.type,
             },
           });
           if (data?.id) {
-            setId(data.id);
+            const ids = (imageIds: string[]) => [...imageIds, data.id];
+            setImageIds(ids);
           }
         } catch (e) {
           console.log(e);
         }
       };
+      reader.onload = loadToS3;
     });
   }, []);
 
@@ -38,46 +44,23 @@ export const DropZone = () => {
     onDrop,
   });
 
-  const getImage = async () => {
-    try {
-      const {data} = await S3_API.get(`${rout}/${id}`, {responseType: 'arraybuffer'});
-      const blob = new Blob([data], {
-        type: 'image/jpeg',
-      });
-      const objectURL = URL.createObjectURL(blob);
-      setPic(objectURL);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  React.useEffect(() => {
-    if (id) {
-      getImage();
-    }
-  }, [id]);
-
-  if (pic) {
-    return (
-      <Image
-        mr="$2"
-        size="lg"
-        borderRadius="$3xl"
-        source={{
-          uri: pic,
-        }}
-      />
-    );
-  }
+  const show = imageIds.length < imagesLimit;
 
   return (
-    <Card borderRadius="$3xl" overflow="hidden" variant="filled" mr="$2" width="96px" height="96px">
-      <div
-        style={{flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-        {...getRootProps({className: 'dropzone'})}>
-        <input {...getInputProps()} />
-        <Icon as={DownloadIcon} m="$2" w="$4" h="$4" />
-      </div>
-    </Card>
+    <>
+      {imageIds.map((imageId: string) => (
+        <S3Image key={imageId} imageId={imageId} />
+      ))}
+      {show ? (
+        <Card borderRadius="$3xl" overflow="hidden" variant="filled" mr="$2" mt="$2" width="96px" height="96px">
+          <div
+            style={{flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+            {...getRootProps({className: 'dropzone'})}>
+            <input {...getInputProps()} />
+            <Icon as={DownloadIcon} m="$2" w="$4" h="$4" />
+          </div>
+        </Card>
+      ) : null}
+    </>
   );
 };
