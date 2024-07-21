@@ -8,33 +8,37 @@ import {S3Image} from './S3Image';
 
 type DropZoneProps = {
   imagesLimit?: number;
+  value: string[];
+  onChange: (value: string[]) => void;
 };
 
-export const DropZone = ({imagesLimit = 6}: DropZoneProps) => {
-  const [imageIds, setImageIds] = React.useState<string[]>([]);
-  const onDrop = React.useCallback((acceptedFiles: any) => {
-    acceptedFiles.forEach((file: Blob) => {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
-      const loadToS3 = async () => {
-        const binaryData = reader.result;
-        try {
-          const {data} = await S3_API.post('/images', binaryData, {
-            headers: {
-              'Content-Type': file.type,
-            },
-          });
-          if (data?.id) {
-            const ids = (imageIds: string[]) => [...imageIds, data.id];
-            setImageIds(ids);
+export const DropZone = ({imagesLimit = 6, value, onChange}: DropZoneProps) => {
+  const onDrop = React.useCallback(
+    (acceptedFiles: any) => {
+      acceptedFiles.forEach((file: Blob) => {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        const loadToS3 = async () => {
+          const binaryData = reader.result;
+          try {
+            const {data} = await S3_API.post('/images', binaryData, {
+              headers: {
+                'Content-Type': file.type,
+              },
+            });
+            if (data?.id) {
+              const newValue = [...value, data.id];
+              onChange(newValue);
+            }
+          } catch (e) {
+            console.log(e);
           }
-        } catch (e) {
-          console.log(e);
-        }
-      };
-      reader.onload = loadToS3;
-    });
-  }, []);
+        };
+        reader.onload = loadToS3;
+      });
+    },
+    [value, onChange],
+  );
 
   const {getRootProps, getInputProps} = useDropzone({
     accept: {
@@ -44,11 +48,11 @@ export const DropZone = ({imagesLimit = 6}: DropZoneProps) => {
     onDrop,
   });
 
-  const show = imageIds.length < imagesLimit;
+  const show = value.length < imagesLimit;
 
   return (
     <>
-      {imageIds.map((imageId: string) => (
+      {value.map((imageId: string) => (
         <S3Image key={imageId} imageId={imageId} />
       ))}
       {show ? (

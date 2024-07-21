@@ -63,6 +63,7 @@ import {isDev} from '../../constants/ui';
 import {DropZone} from './DropZone';
 
 const createEventSchema = z.object({
+  images: z.array(z.string()).min(1, 'Images is required'),
   name: z.string().min(1, 'Event name is required'),
   desc: z.string().min(1, 'Event description is required'),
   price: z.number(),
@@ -72,8 +73,8 @@ const createEventSchema = z.object({
 type CreateEventSchemaType = z.infer<typeof createEventSchema>;
 
 const defaultValues = isDev
-  ? {name: 'test event name', desc: '', price: 0, amount: 0}
-  : ({name: '', desc: '', price: 0, amount: 0} satisfies CreateEventSchemaType);
+  ? {images: [], name: 'test event name', desc: '', price: 0, amount: 0}
+  : ({images: [], name: '', desc: '', price: 0, amount: 0} satisfies CreateEventSchemaType);
 
 const CreateEventForm = () => {
   const {
@@ -115,13 +116,35 @@ const CreateEventForm = () => {
             <AvatarFallbackText>John Doe</AvatarFallbackText>
           </Avatar>
         </FormControl>
-        <FormControl my="$2">
+
+        <FormControl my="$2" isInvalid={!!errors.images} isRequired={true}>
           <FormControlLabel>
-            <FormControlLabelText>Add Location Details</FormControlLabelText>
+            <FormControlLabelText>Add Images</FormControlLabelText>
           </FormControlLabel>
-          <VStack w="$full" flex={1} justifyContent="flex-start" flexDirection="row" flexWrap="wrap">
-            <DropZone />
-          </VStack>
+          <Controller
+            name="images"
+            defaultValue={[]}
+            control={control}
+            rules={{
+              validate: async (value) => {
+                try {
+                  await createEventSchema.parseAsync({images: value});
+                  return true;
+                } catch (error: any) {
+                  return error.message;
+                }
+              },
+            }}
+            render={({field: {onChange, value}}) => (
+              <VStack w="$full" flex={1} justifyContent="flex-start" flexDirection="row" flexWrap="wrap">
+                <DropZone value={value} onChange={onChange} />
+              </VStack>
+            )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="md" as={AlertTriangle} />
+            <FormControlErrorText>{errors?.images?.message}</FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         <FormControl my="$2" isInvalid={!!errors.name} isRequired={true}>
