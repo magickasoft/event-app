@@ -10,3 +10,8 @@ export function getS3ApiURL(): string {
   const url = isWeb ? 'http://localhost:3000/s3/' : (process.env.EXPO_S3_API_URL as string);
   return buildServerURL(url);
 }
+
+export function getBaseApiURL(): string {
+  const url = isWeb ? 'http://localhost:3000/base/' : (process.env.EXPO_BASE_API_URL as string);
+  return buildServerURL(url);
+}

@@ -22,11 +22,17 @@ const s3ApiProxy = createProxyMiddleware({
   changeOrigin: true,
 });
 
+const baseApiProxy = createProxyMiddleware({
+  target: process.env.EXPO_BASE_API_URL || 'http://localhost:8002',
+  changeOrigin: true,
+});
+
 const app = express();
 
 app.use(cors(corsConfig));
 app.use('/auth/', authApiProxy);
 app.use('/s3/', s3ApiProxy);
+app.use('/base/', baseApiProxy);
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
