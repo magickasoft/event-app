@@ -12,6 +12,7 @@ import {config} from '../gluestack-ui.config';
 
 import {SessionProvider} from '@/contexts/auth';
 import {QueryClientProvider} from '@/contexts/QueryClientProvider';
+import '@/lib/array';
 
 export {
   // Catch any errors thrown by the Layout component.
