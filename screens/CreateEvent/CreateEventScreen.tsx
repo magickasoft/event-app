@@ -67,8 +67,8 @@ import {DSMultiSelect} from './DSMultiSelect';
 
 const createEventSchema = z.object({
   pictures: z.array(z.string()).min(1, 'Images is required'),
-  name: z.string().min(1, 'Event name is required'),
-  description: z.string(),
+  name: z.string().min(15, 'Event name is required'),
+  description: z.string().min(20, 'Description is required'),
   price: z.number(),
   maxNumberOfPeople: z.number(),
   gender: z.string(),
@@ -78,8 +78,8 @@ const createEventSchema = z.object({
 type CreateEventSchemaType = z.infer<typeof createEventSchema>;
 
 const mockValues = {
-  locationLatitude: 54.84169108416528,
-  locationLongitude: 83.10342921441519,
+  locationLatitude: 55.03070287791311,
+  locationLongitude: 82.924584805415,
   ageFrom: 25,
   ageTo: 100,
 };
@@ -104,9 +104,9 @@ const listOfEventTypes = [
 ];
 
 const listOfGenders = [
-  {value: 'all', label: 'All'},
-  {value: 'male', label: 'Male only'},
-  {value: 'female', label: 'Female only'},
+  {value: 'ALL', label: 'All'},
+  {value: 'MALE', label: 'Male only'},
+  {value: 'FEMALE', label: 'Female only'},
 ];
 
 const defaultValues = {
