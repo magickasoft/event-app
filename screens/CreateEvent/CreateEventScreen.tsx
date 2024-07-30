@@ -237,7 +237,7 @@ const CreateEventForm = () => {
           </FormControlError>
         </FormControl>
 
-        <FormControl my="$2" isInvalid={!!errors.description} isRequired={true}>
+        <FormControl my="$2" isInvalid={!!errors.description} isRequired={false}>
           <FormControlLabel>
             <FormControlLabelText>Event description</FormControlLabelText>
           </FormControlLabel>
