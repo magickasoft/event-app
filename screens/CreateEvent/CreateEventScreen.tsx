@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   Button,
   FormControl,
@@ -62,6 +62,7 @@ import GuestLayout from '../../layouts/GuestLayout';
 
 import {isDev} from '../../constants/ui';
 import {DropZone} from './DropZone';
+import {DSSelect} from './DSSelect';
 
 const createEventSchema = z.object({
   eventPictures: z.array(z.string()).min(1, 'Images is required'),
@@ -69,13 +70,13 @@ const createEventSchema = z.object({
   description: z.string(),
   price: z.number(),
   maxNumberOfPeople: z.number(),
+  gender: z.string(),
 });
 
 type CreateEventSchemaType = z.infer<typeof createEventSchema>;
 
 const mockValues = {
   eventTypes: ['RESTAURANT'],
-  gender: 'ALL',
   locationLatitude: 54.84169108416528,
   locationLongitude: 83.10342921441519,
   ageFrom: 25,
@@ -89,6 +90,7 @@ const defaultValues = isDev
       description: 'eventDescription',
       price: 1500,
       maxNumberOfPeople: 10,
+      gender: 'all',
     }
   : ({
       eventPictures: [],
@@ -96,6 +98,7 @@ const defaultValues = isDev
       description: '',
       price: 1,
       maxNumberOfPeople: 1,
+      gender: 'all',
     } satisfies CreateEventSchemaType);
 
 const CreateEventForm = () => {
@@ -367,74 +370,42 @@ const CreateEventForm = () => {
           </FormControlError>
         </FormControl>
 
-        {/* <FormControl my="$2">
-          <FormControlLabel>
-            <FormControlLabelText>Who can see my event on the map</FormControlLabelText>
-          </FormControlLabel>
-          <Select>
-            <SelectTrigger variant="outline" size="md">
-              <SelectInput placeholder="Select option" />
-              <SelectIcon mr="$3">
-                <Icon as={ChevronDownIcon} />
-              </SelectIcon>
-            </SelectTrigger>
-            <SelectPortal>
-              <SelectBackdrop />
-              <SelectContent>
-                <SelectDragIndicatorWrapper>
-                  <SelectDragIndicator />
-                </SelectDragIndicatorWrapper>
-                <SelectItem label="All" value="all" />
-                <SelectItem label="Contacts" value="contacts" />
-                <SelectItem label="Subscribers" value="subscribers" />
-              </SelectContent>
-            </SelectPortal>
-          </Select>
-        </FormControl> */}
-
-        {/* <FormControl my="$2">
-          <FormControlLabel>
-            <FormControlLabelText>Who can join me</FormControlLabelText>
-          </FormControlLabel>
-          <Select>
-            <SelectTrigger variant="outline" size="md">
-              <SelectInput placeholder="Select option" />
-              <SelectIcon mr="$3">
-                <Icon as={ChevronDownIcon} />
-              </SelectIcon>
-            </SelectTrigger>
-            <SelectPortal>
-              <SelectBackdrop />
-              <SelectContent>
-                <SelectDragIndicatorWrapper>
-                  <SelectDragIndicator />
-                </SelectDragIndicatorWrapper>
-                <SelectItem label="All" value="all" />
-                <SelectItem label="Contacts" value="contacts" />
-                <SelectItem label="Subscribers" value="subscribers" />
-              </SelectContent>
-            </SelectPortal>
-          </Select>
-        </FormControl> */}
-
-        <FormControl my="$2">
+        <FormControl my="$2" isInvalid={!!errors.gender} isRequired={false}>
           <FormControlLabel>
             <FormControlLabelText>People filter</FormControlLabelText>
           </FormControlLabel>
-          <VStack w="$full" flex={1} justifyContent="flex-start" flexDirection="row" flexWrap="wrap">
-            <Badge mt="$2" mr="$2" size="lg" variant="solid" borderRadius="$lg" action="info">
-              <BadgeText>All</BadgeText>
-              <BadgeIcon as={InfoIcon} ml="$2" />
-            </Badge>
-            <Badge mt="$2" mr="$2" size="lg" variant="solid" borderRadius="$lg" action="info">
-              <BadgeText>Male only</BadgeText>
-              <BadgeIcon as={InfoIcon} ml="$2" />
-            </Badge>
-            <Badge mt="$2" mr="$2" size="lg" variant="solid" borderRadius="$lg" action="info">
-              <BadgeText>Female only</BadgeText>
-              <BadgeIcon as={InfoIcon} ml="$2" />
-            </Badge>
-          </VStack>
+          <Controller
+            name="gender"
+            defaultValue=""
+            control={control}
+            rules={{
+              validate: async (value) => {
+                try {
+                  await createEventSchema.parseAsync({gender: value});
+                  return true;
+                } catch (error: any) {
+                  return error.message;
+                }
+              },
+            }}
+            render={({field: {onChange, value}}) => (
+              <VStack w="$full" flex={1} justifyContent="flex-start" flexDirection="row" flexWrap="wrap">
+                <DSSelect
+                  items={[
+                    {value: 'all', label: 'All'},
+                    {value: 'male', label: 'Male only'},
+                    {value: 'female', label: 'Female only'},
+                  ]}
+                  value={value}
+                  onChange={onChange}
+                />
+              </VStack>
+            )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="md" as={AlertTriangle} />
+            <FormControlErrorText>{errors?.gender?.message}</FormControlErrorText>
+          </FormControlError>
         </FormControl>
       </VStack>
       <Button variant="solid" size="lg" mt="$5" onPress={handleSubmit(onSubmit)}>
