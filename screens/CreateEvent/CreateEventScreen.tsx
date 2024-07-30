@@ -66,13 +66,13 @@ import {DSSelect} from './DSSelect';
 import {DSMultiSelect} from './DSMultiSelect';
 
 const createEventSchema = z.object({
-  eventPictures: z.array(z.string()).min(1, 'Images is required'),
-  eventName: z.string().min(1, 'Event name is required'),
+  pictures: z.array(z.string()).min(1, 'Images is required'),
+  name: z.string().min(1, 'Event name is required'),
   description: z.string(),
   price: z.number(),
   maxNumberOfPeople: z.number(),
   gender: z.string(),
-  eventTypes: z.array(z.string()).min(1, 'event type is required'),
+  types: z.array(z.string()).min(1, 'event type is required'),
 });
 
 type CreateEventSchemaType = z.infer<typeof createEventSchema>;
@@ -109,25 +109,15 @@ const listOfGenders = [
   {value: 'female', label: 'Female only'},
 ];
 
-const defaultValues = isDev
-  ? {
-      eventPictures: [],
-      eventName: 'eventName',
-      description: 'eventDescription',
-      price: 1500,
-      maxNumberOfPeople: 10,
-      gender: listOfGenders[0].value,
-      eventTypes: [listOfEventTypes[0].value],
-    }
-  : ({
-      eventPictures: [],
-      eventName: '',
-      description: '',
-      price: 1,
-      maxNumberOfPeople: 1,
-      gender: listOfGenders[0].value,
-      eventTypes: [listOfEventTypes[0].value],
-    } satisfies CreateEventSchemaType);
+const defaultValues = {
+  name: '',
+  pictures: [],
+  description: '',
+  price: 1000,
+  maxNumberOfPeople: 10,
+  gender: listOfGenders[0].value,
+  types: [listOfEventTypes[0].value],
+} satisfies CreateEventSchemaType;
 
 const CreateEventForm = () => {
   const {
@@ -178,18 +168,18 @@ const CreateEventForm = () => {
   return (
     <>
       <VStack justifyContent="space-between">
-        <FormControl my="$2" isInvalid={!!errors.eventPictures} isRequired={true}>
+        <FormControl my="$2" isInvalid={!!errors.pictures} isRequired={true}>
           <FormControlLabel>
             <FormControlLabelText>Add Images</FormControlLabelText>
           </FormControlLabel>
           <Controller
-            name="eventPictures"
+            name="pictures"
             defaultValue={[]}
             control={control}
             rules={{
               validate: async (value) => {
                 try {
-                  await createEventSchema.parseAsync({eventPictures: value});
+                  await createEventSchema.parseAsync({pictures: value});
                   return true;
                 } catch (error: any) {
                   return error.message;
@@ -204,22 +194,22 @@ const CreateEventForm = () => {
           />
           <FormControlError>
             <FormControlErrorIcon size="md" as={AlertTriangle} />
-            <FormControlErrorText>{errors?.eventPictures?.message}</FormControlErrorText>
+            <FormControlErrorText>{errors?.pictures?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
 
-        <FormControl my="$2" isInvalid={!!errors.eventName} isRequired={true}>
+        <FormControl my="$2" isInvalid={!!errors.name} isRequired={true}>
           <FormControlLabel>
             <FormControlLabelText>Event name</FormControlLabelText>
           </FormControlLabel>
           <Controller
-            name="eventName"
+            name="name"
             defaultValue=""
             control={control}
             rules={{
               validate: async (value) => {
                 try {
-                  await createEventSchema.parseAsync({eventName: value});
+                  await createEventSchema.parseAsync({name: value});
                   return true;
                 } catch (error: any) {
                   return error.message;
@@ -243,7 +233,7 @@ const CreateEventForm = () => {
           />
           <FormControlError>
             <FormControlErrorIcon size="md" as={AlertTriangle} />
-            <FormControlErrorText>{errors?.eventName?.message}</FormControlErrorText>
+            <FormControlErrorText>{errors?.name?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
 
@@ -288,18 +278,18 @@ const CreateEventForm = () => {
           </FormControlError>
         </FormControl>
 
-        <FormControl my="$2" isInvalid={!!errors.eventTypes} isRequired={false}>
+        <FormControl my="$2" isInvalid={!!errors.types} isRequired={false}>
           <FormControlLabel>
             <FormControlLabelText>Select Event Type</FormControlLabelText>
           </FormControlLabel>
           <Controller
-            name="eventTypes"
+            name="types"
             defaultValue={[]}
             control={control}
             rules={{
               validate: async (value) => {
                 try {
-                  await createEventSchema.parseAsync({eventTypes: value});
+                  await createEventSchema.parseAsync({types: value});
                   return true;
                 } catch (error: any) {
                   return error.message;
@@ -314,7 +304,7 @@ const CreateEventForm = () => {
           />
           <FormControlError>
             <FormControlErrorIcon size="md" as={AlertTriangle} />
-            <FormControlErrorText>{errors?.eventTypes?.message}</FormControlErrorText>
+            <FormControlErrorText>{errors?.types?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
 
@@ -324,7 +314,7 @@ const CreateEventForm = () => {
           </FormControlLabel>
           <Controller
             name="maxNumberOfPeople"
-            defaultValue=""
+            defaultValue={0}
             control={control}
             rules={{
               validate: async (value) => {
