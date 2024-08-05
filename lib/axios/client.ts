@@ -3,31 +3,13 @@
 import type {AxiosError, AxiosInstance, AxiosRequestConfig} from 'axios';
 import axios from 'axios';
 
-import {getAuthApiURL, getS3ApiURL, getBaseApiURL} from '../get-server-url';
+import {getApiURL} from '../get-server-url';
 import {getAccessToken} from '../get-access-token';
 
-const AUTH_API: AxiosInstance = axios.create({
-  baseURL: getAuthApiURL(),
-  responseType: 'json',
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
-});
-
-const S3_API: AxiosInstance = axios.create({
-  baseURL: getS3ApiURL(),
-  responseType: 'json',
-  withCredentials: true,
-  headers: {},
-});
-
 const BASE_API: AxiosInstance = axios.create({
-  baseURL: getBaseApiURL(),
+  baseURL: getApiURL(),
   responseType: 'json',
   withCredentials: true,
-  headers: {},
 });
 
 const requestInterceptor = async (config: AxiosRequestConfig): Promise<any> => {
@@ -47,8 +29,6 @@ const requestErrorInterceptor = (error: AxiosError): Promise<never> => {
   return Promise.reject(error);
 };
 
-AUTH_API.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
-S3_API.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
 BASE_API.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
 
-export {AUTH_API, S3_API, BASE_API};
+export {BASE_API};

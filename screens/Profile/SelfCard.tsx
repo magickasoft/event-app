@@ -3,7 +3,7 @@ import {Text, Box, Heading, Avatar, AvatarFallbackText} from '@gluestack-ui/them
 import {useQuery} from '@tanstack/react-query';
 
 import {useSession} from '@/hooks/useSession';
-import {AUTH_API} from '@/lib/axios/client';
+import {BASE_API} from '@/lib/axios/client';
 
 const rout = '/authentication/user/';
 export const SelfCard = () => {
@@ -11,7 +11,7 @@ export const SelfCard = () => {
 
   const {isLoading, isError, data} = useQuery({
     queryKey: [rout],
-    queryFn: () => AUTH_API.get(`${rout}${decodeToken?.sub}`),
+    queryFn: () => BASE_API.get(`${rout}${decodeToken?.sub}`),
     refetchOnMount: true,
     select: (response) => response?.data,
   });

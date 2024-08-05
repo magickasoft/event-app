@@ -1,12 +1,12 @@
 import * as React from 'react';
-import {S3_API} from '@/lib/axios/client';
+import {BASE_API} from '@/lib/axios/client';
 
 export function useS3URL(id?: string) {
   const [url, setURL] = React.useState<string>('');
 
   const getImageURL = async () => {
     try {
-      const {data} = await S3_API.get(`/images/${id}`, {responseType: 'arraybuffer'});
+      const {data} = await BASE_API.get(`/images/${id}`, {responseType: 'arraybuffer'});
       const blob = new Blob([data], {
         type: 'image/jpeg',
       });

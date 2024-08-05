@@ -14,7 +14,7 @@ import {router} from 'expo-router';
 
 import {Toast, ToastTitle, useToast} from '@gluestack-ui/themed';
 
-import {AUTH_API} from '@/lib/axios/client';
+import {BASE_API} from '@/lib/axios/client';
 import {jwtDecode} from 'jwt-decode';
 
 export const AuthContext = React.createContext<AuthContextValue>({
@@ -39,7 +39,7 @@ export function SessionProvider(props: Readonly<React.PropsWithChildren>) {
   const codeVerification = async (data: CodeVerificationRequestData) => {
     if (actionId) {
       try {
-        await AUTH_API.post<Readonly<CodeVerificationRequestData>, Readonly<CodeVerificationResponseData>>(
+        await BASE_API.post<Readonly<CodeVerificationRequestData>, Readonly<CodeVerificationResponseData>>(
           `/authentication/verify-action/${actionId}`,
           data,
         );
@@ -62,7 +62,7 @@ export function SessionProvider(props: Readonly<React.PropsWithChildren>) {
 
   const signUp = async (data: SignUpRequestData) => {
     try {
-      const response = await AUTH_API.post<Readonly<SignUpRequestData>, Readonly<SignUpResponseData>>(
+      const response = await BASE_API.post<Readonly<SignUpRequestData>, Readonly<SignUpResponseData>>(
         '/authentication/sign-up',
         data,
       );
@@ -85,7 +85,7 @@ export function SessionProvider(props: Readonly<React.PropsWithChildren>) {
 
   const signIn = async (data: Oauth2TokenRequestData) => {
     try {
-      const response = await AUTH_API.post<Readonly<Oauth2TokenRequestData>, Readonly<Oauth2TokenResponseData>>(
+      const response = await BASE_API.post<Readonly<Oauth2TokenRequestData>, Readonly<Oauth2TokenResponseData>>(
         '/authentication/log-in',
         data,
       );
@@ -108,7 +108,7 @@ export function SessionProvider(props: Readonly<React.PropsWithChildren>) {
 
   const signOut = async () => {
     try {
-      await AUTH_API.post('/authentication/log-out', {
+      await BASE_API.post('/authentication/log-out', {
         refresh_token: refreshToken,
       });
     } catch (e) {
@@ -130,7 +130,19 @@ export function SessionProvider(props: Readonly<React.PropsWithChildren>) {
       refreshToken,
       isLoading: isATLoading || isRTLoading || isAILoading,
     }),
-    [isAILoading, isATLoading, isRTLoading, actionId, accessToken, refreshToken, decodeToken, codeVerification, signUp, signIn, signOut],
+    [
+      isAILoading,
+      isATLoading,
+      isRTLoading,
+      actionId,
+      accessToken,
+      refreshToken,
+      decodeToken,
+      codeVerification,
+      signUp,
+      signIn,
+      signOut,
+    ],
   );
 
   return <AuthContext.Provider value={contextValue}>{props.children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Card, Icon, DownloadIcon} from '@gluestack-ui/themed';
 
-import {S3_API} from '@/lib/axios/client';
+import {BASE_API} from '@/lib/axios/client';
 import {useDropzone} from 'react-dropzone';
 
 import {S3Image} from './S3Image';
@@ -21,7 +21,7 @@ export const DropZone = ({imagesLimit = 6, value, onChange}: DropZoneProps) => {
         const loadToS3 = async () => {
           const binaryData = reader.result;
           try {
-            const {data} = await S3_API.post('/images', binaryData, {
+            const {data} = await BASE_API.post('/images', binaryData, {
               headers: {
                 'Content-Type': file.type,
               },
